@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gravity Aligner", "LiftCalculator\Gravity Aligner.csproj", "{1E25EA85-CA80-420B-B88B-11F4646DE720}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planet2Space", "LiftAutopilot\Planet2Space.csproj", "{48A52E33-D9FC-447F-828E-71C0216AD2AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E25EA85-CA80-420B-B88B-11F4646DE720}.Debug|x64.ActiveCfg = Debug|x64
+		{1E25EA85-CA80-420B-B88B-11F4646DE720}.Debug|x64.Build.0 = Debug|x64
+		{48A52E33-D9FC-447F-828E-71C0216AD2AA}.Debug|x64.ActiveCfg = Debug|x64
+		{48A52E33-D9FC-447F-828E-71C0216AD2AA}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {938E460D-3712-40CF-8617-7B13C17D0BA3}
+	EndGlobalSection
+EndGlobal
