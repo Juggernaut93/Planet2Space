@@ -1011,8 +1011,6 @@ namespace IngameScript
             public static float Sensitivity = 1; // input sensitivity 
             public static float PitchSensitivity = .2f; // input sensitivity for pitch
 
-            public static Base6Directions.Direction ReferenceDirection = Base6Directions.Direction.Down;
-
             static PIDControllerFloat GyroControllerPitch = new PIDControllerFloat();
             static PIDControllerFloat GyroControllerRoll = new PIDControllerFloat();
 
@@ -1024,23 +1022,7 @@ namespace IngameScript
             public static Vector3 Down() // local
             {
                 double a = Rotion.deg2rad * (PitchOffsetDegrees + MathHelper.Clamp(PitchTiltDegrees, -PitchTiltMaxDegrees, PitchTiltMaxDegrees));
-                switch (ReferenceDirection)
-                {
-                    case Base6Directions.Direction.Down:
-                        return new Vector3D(0, -Math.Cos(a), Math.Sin(a));
-                    case Base6Directions.Direction.Up:
-                        return new Vector3D(0, Math.Cos(a), Math.Sin(a));
-                    case Base6Directions.Direction.Forward:
-                        return new Vector3D(0, -Math.Sin(a), -Math.Cos(a));
-                    case Base6Directions.Direction.Backward:
-                        return new Vector3D(0, Math.Sin(a), Math.Cos(a));
-                    case Base6Directions.Direction.Left:
-                        return new Vector3D(-Math.Cos(a), 0, Math.Sin(a));
-                    case Base6Directions.Direction.Right:
-                        return new Vector3D(Math.Cos(a), 0, Math.Sin(a));
-                    default:
-                        return new Vector3D(0, 0, 0); ; //should never happen
-                }
+                return new Vector3D(0, -Math.Cos(a), Math.Sin(a));
             }
             public static Vector3 CurrentAngles() // in radians
             {
@@ -1125,10 +1107,6 @@ namespace IngameScript
                 }
                 else
                 {
-                    if (varn == "direction")
-                    {
-                        return Enum.TryParse<Base6Directions.Direction>(tokens[1], out ReferenceDirection);
-                    }
                     double val;
                     if (!double.TryParse(tokens[1], out val)) return false; var vf = (float)val;
                     if (varn == "pitchoffsetdegrees" || varn == "pitchofs") // legacy name - TODO REMOVE
@@ -1181,7 +1159,6 @@ namespace IngameScript
       "alignangularresponsei=" + ResponseI,
       "alignangularresponsed=" + ResponseD,
       "alignangularresponsed2=" + ResponseD2,
-      "direction=" + ReferenceDirection
     };
             }
         }
@@ -1529,22 +1506,6 @@ namespace IngameScript
 
         public void Main(string arg, UpdateType updateSource)
         {
-            Base6Directions.Direction direction;
-            if (arg.StartsWith("go;"))
-            {
-                string[] splits = arg.Split(';');
-                arg = "go";
-                try
-                {
-                    direction = (Base6Directions.Direction)Enum.Parse(typeof(Base6Directions.Direction), splits[1], true);
-                }
-                catch (Exception)
-                {
-                    direction = Base6Directions.Direction.Down;
-                }
-                Upright.ReferenceDirection = direction;
-            }
-
             Module.run = Runtime;
             try
             {
@@ -1558,7 +1519,6 @@ namespace IngameScript
                 throw new Exception("Main:\n" + e.Message);
             }
         }
-
 
     }
 }
