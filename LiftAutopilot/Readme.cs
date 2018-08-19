@@ -19,6 +19,11 @@
  *          - MAKE SURE the ship can sustain its own weight!
  *          - Also, if you want your ship to stop after reaching space, be sure you have place thrusters of your preferred thruster
  *            type in each of the 6 orthogonal directions of the ship (especially the downward direction to stop the upward velocity).
+ *   
+ *   !!! WARNING !!!
+ *   IF YOU HAVE A SHIP WITH A COCKPIT/CONTROL STATION/ETC. WITH THE FRONT ORIENTED TOWARDS SPACE (I.E. ROCKET-LIKE) MAKE SURE TO
+ *   ADD A SECONDARY SHIP CONTROLLER (E.G. REMOTE CONTROL) ORIENTED IN THE "NORMAL WAY" (THE DOWNSIDE OF THE REMOTE CONTROLLER IS
+ *   ORIENTED TOWARDS THE PLANET = THE DIRECTION TOWARDS WHICH THE THRUSTER THAT SHOULD LIFT YOUR SHIP TO SPACE WILL PUSH).
  *  
  *   HOW IT WORKS:
  *      1) All landing gears (if present) are unlocked and all thrusters not pointing up are shut down
