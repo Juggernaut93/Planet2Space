@@ -1,9 +1,5 @@
 # Planet2Space
 
-
-R e a d m e
------------
-
 Planet2Space by Juggernaut93 (with code from Gravity Aligner by p3st|cIdE)
 
 SETUP:
