@@ -21,7 +21,6 @@ namespace IngameScript
     {
         private string GroupName = "Aligner"; // name of group in terminal containing cockpit, gyros, text panel
         private bool preferHydroToIon = true;
-        private Base6Directions.Direction direction = Base6Directions.Direction.Down; // which direction is down w.r.t. the cockpit in GroupName?
 
         private bool DEBUG = false;
 
@@ -71,9 +70,9 @@ namespace IngameScript
                 {
                     string[] splits = Storage.Split(';');
                     /*if (splits.Length != 8)
-                    {
-                        throw new Exception("Wrong storage parameter count.");
-                    }*/
+                            {
+                                throw new Exception("Wrong storage parameter count.");
+                            }*/
                     Enum.TryParse<Status>(splits[0], out status);
                     Enum.TryParse<UpStatus>(splits[1], out upStatus);
                     correctionFactor = Double.Parse(splits[2]);
@@ -82,7 +81,6 @@ namespace IngameScript
                     controller = (IMyShipController)GridTerminalSystem.GetBlockWithId(Int64.Parse(splits[5]));
                     GroupName = splits[6];
                     preferHydroToIon = bool.Parse(splits[7]);
-                    Enum.TryParse<Base6Directions.Direction>(splits[8], out direction);
                 }
                 catch (Exception e)
                 {
@@ -94,7 +92,6 @@ namespace IngameScript
                     Runtime.UpdateFrequency = UpdateFrequency.None;
                     GroupName = "Aligner";
                     preferHydroToIon = true;
-                    direction = Base6Directions.Direction.Down;
                     throw e;
                 }
             }
@@ -123,17 +120,17 @@ namespace IngameScript
             // setup program execution structure by modules
             Module.run = Runtime;
             Module.Init(new Module[] {
-                Scanner.Init(Me, GridTerminalSystem, GroupName),
-                Time.Init(),
-                Graph.Init(),
-                Vessel.Init(),
-                Rotion.Init(),
-                Upright.Init(),
-                GravityAligner.Init(),
-                Log.Init(),
-                Chart.Init(),
-                Screen.Init(),
-            });
+        Scanner.Init(Me, GridTerminalSystem, GroupName),
+        Time.Init(),
+        Graph.Init(),
+        Vessel.Init(),
+        Rotion.Init(),
+        Upright.Init(),
+        GravityAligner.Init(),
+        Log.Init(),
+        Chart.Init(),
+        Screen.Init(),
+    });
         }
 
         public void Save()
@@ -146,8 +143,7 @@ namespace IngameScript
             toSave += Runtime.UpdateFrequency + ";";
             toSave += controller.EntityId + ";";
             toSave += GroupName + ";";
-            toSave += preferHydroToIon + ";";
-            toSave += direction;
+            toSave += preferHydroToIon;
 
             Storage = toSave;
 
@@ -456,17 +452,14 @@ namespace IngameScript
             }
         }
 
-        #region GravityAligner
         // SCANNER
 
         public static class Scanner
         {
-            #region fill from ctor // TODO readonly
             public static IMyProgrammableBlock Me;
             public static IMyGridTerminalSystem Terminal;
             public static string GroupName;
             public static TimeSpan RescanPeriod = Time.s(5); // damage, building can affect available blocks
-            #endregion
             public static IMyBlockGroup Group;
             public static List<IMyTerminalBlock> Blocks = new List<IMyTerminalBlock>();
             public static bool FromCtor { get { return first; } }
@@ -811,7 +804,7 @@ namespace IngameScript
             public float Error { get { return prevErr; } }
             public float Integral { get { return integral; } set { integral = value; } } // client may wish to reset the integral occasionally
 
-            public void SetTarget(float s) //, double resetDistance) 
+            public void SetTarget(float s) //, double resetDistance)
             {
                 var targetDelta = s - target;
                 prevErr += targetDelta; // pretend like we were already at the old setpoint to avoid a momentary hiccup
@@ -904,7 +897,7 @@ namespace IngameScript
             public static string _(float f) { return NoTiny(f, 1).ToString("g3"); }
             public static string _(double d) { return NoTiny((float)d, 1).ToString("g4"); }
 
-            const string degUnit = " °"; // angular degrees 
+            const string degUnit = " °"; // angular degrees
             public static string Degrees(double a) { return _((float)a) + degUnit; }
             public static string Radians(double a) { return Degrees(MathHelper.ToDegrees((float)a)); }
             public static string Degrees(Vector3 a) { return _(a) + degUnit; }
@@ -1338,7 +1331,7 @@ namespace IngameScript
             {
                 if (propGyroOverride == null)
                 {
-                    propGyroOverride = g.GetProperty("Override").AsBool(); // for setting 
+                    propGyroOverride = g.GetProperty("Override").AsBool(); // for setting
                     propGyroPitch = g.GetProperty("Pitch").AsFloat();
                     propGyroYaw = g.GetProperty("Yaw").AsFloat();
                     propGyroRoll = g.GetProperty("Roll").AsFloat();
@@ -1349,7 +1342,7 @@ namespace IngameScript
                 gtorque *= g.GyroPower;
                 TotalTorque += gtorque;
                 //Log.scan.AppendLine("'" + g.CustomName + "' at " + (int)(g.GyroPower*100) + '%'
-                //  + "rated " + propGyroYaw.GetMaximum(g)*MathHelper.RadiansPerSecondToRPM + " RPM"); 
+                //  + "rated " + propGyroYaw.GetMaximum(g)*MathHelper.RadiansPerSecondToRPM + " RPM");
             }
 
             const float tiny = .05f;
@@ -1419,10 +1412,8 @@ namespace IngameScript
             public static float ResponseD2 = .1f; //1.4; // proportional to square of angular velocity, works much better for my purposes than using first derivative
             public static float ThresholdBoundaryBoost = .001f;
             public static float Stoppability = 1e-5f; // for estimating stopping power TODO estimate from gyros and ship mass
-            public static float Sensitivity = 1; // input sensitivity 
+            public static float Sensitivity = 1; // input sensitivity
             public static float PitchSensitivity = .2f; // input sensitivity for pitch
-
-            public static Base6Directions.Direction ReferenceDirection = Base6Directions.Direction.Down;
 
             static PIDControllerFloat GyroControllerPitch = new PIDControllerFloat();
             static PIDControllerFloat GyroControllerRoll = new PIDControllerFloat();
@@ -1435,23 +1426,7 @@ namespace IngameScript
             public static Vector3 Down() // local
             {
                 double a = Rotion.deg2rad * (PitchOffsetDegrees + MathHelper.Clamp(PitchTiltDegrees, -PitchTiltMaxDegrees, PitchTiltMaxDegrees));
-                switch (ReferenceDirection)
-                {
-                    case Base6Directions.Direction.Down:
-                        return new Vector3D(0, -Math.Cos(a), Math.Sin(a));
-                    case Base6Directions.Direction.Up:
-                        return new Vector3D(0, Math.Cos(a), Math.Sin(a));
-                    case Base6Directions.Direction.Forward:
-                        return new Vector3D(0, -Math.Sin(a), -Math.Cos(a));
-                    case Base6Directions.Direction.Backward:
-                        return new Vector3D(0, Math.Sin(a), Math.Cos(a));
-                    case Base6Directions.Direction.Left:
-                        return new Vector3D(-Math.Cos(a), 0, Math.Sin(a));
-                    case Base6Directions.Direction.Right:
-                        return new Vector3D(Math.Cos(a), 0, Math.Sin(a));
-                    default:
-                        return new Vector3D(0, 0, 0); ; //should never happen
-                }
+                return new Vector3D(0, -Math.Cos(a), Math.Sin(a));
             }
             public static Vector3 CurrentAngles() // in radians
             {
@@ -1486,7 +1461,7 @@ namespace IngameScript
                 var response = -clippedlimits;
                 response.X = (float)Utility.BoostZone(response.X, ThresholdBoundaryBoost);
                 response.Z = (float)Utility.BoostZone(response.Z, ThresholdBoundaryBoost);
-                // since the Targets were never set, they're still at zero always. 
+                // since the Targets were never set, they're still at zero always.
                 GyroControllerPitch.Kp2 = GyroControllerRoll.Kp2 = (float)ResponseP2;
                 GyroControllerPitch.Kp = GyroControllerRoll.Kp = (float)ResponseP;
                 GyroControllerPitch.Ki = GyroControllerRoll.Ki = (float)ResponseI;
@@ -1536,10 +1511,6 @@ namespace IngameScript
                 }
                 else
                 {
-                    if (varn == "direction")
-                    {
-                        return Enum.TryParse<Base6Directions.Direction>(tokens[1], out ReferenceDirection);
-                    }
                     double val;
                     if (!double.TryParse(tokens[1], out val)) return false; var vf = (float)val;
                     if (varn == "pitchoffsetdegrees" || varn == "pitchofs") // legacy name - TODO REMOVE
@@ -1592,7 +1563,6 @@ namespace IngameScript
       "alignangularresponsei=" + ResponseI,
       "alignangularresponsed=" + ResponseD,
       "alignangularresponsed2=" + ResponseD2,
-      "direction=" + ReferenceDirection,
     };
             }
         }
@@ -1647,7 +1617,7 @@ namespace IngameScript
             }
             public string Text = null; // text or texture name (will show "OFFLINE" if null either way)
             public float Param = 0f; // override font size or image time if > 0
-            public bool Texture = false; // if true, Text is texture name to show 
+            public bool Texture = false; // if true, Text is texture name to show
             public bool Compact = true; // if true, font size is doubled on wide panels, halved on large ship corner panels
 
             public Color TextColor = Color.White;
@@ -1735,7 +1705,7 @@ namespace IngameScript
                 return chart;
             }
             public static Chart ForLight(IMyLightingBlock light)
-            { // select by CustomData or subtype  
+            { // select by CustomData or subtype
                 Chart chart = null;
                 chart = chart ?? Select(light, Title, GetCustomData);
                 chart = chart ?? Select(light, Subtype, GetSubtype);
@@ -1910,7 +1880,6 @@ namespace IngameScript
                 Rotion.NoTurnVessel();
             }
         }
-        #endregion GravityAligner
 
         private void RecalculateShipBlocks(bool alsoController)
         {
@@ -1920,8 +1889,7 @@ namespace IngameScript
             }
             upThrusters = new List<IMyThrust>();
             // only thrusters on our grid to avoid alignment shenanigans
-            //GridTerminalSystem.GetBlocksOfType<IMyThrust>(upThrusters, block => block.CubeGrid == Me.CubeGrid && Base6Directions.GetOppositeDirection(block.Orientation.Forward) == controller.Orientation.Up);
-            GridTerminalSystem.GetBlocksOfType<IMyThrust>(upThrusters, block => block.CubeGrid == Me.CubeGrid && Base6Directions.GetOppositeDirection(block.Orientation.Forward) == Base6Directions.GetOppositeDirection(this.direction));
+            GridTerminalSystem.GetBlocksOfType<IMyThrust>(upThrusters, block => block.CubeGrid == Me.CubeGrid && Base6Directions.GetOppositeDirection(block.Orientation.Forward) == controller.Orientation.Up);
             upAtmo = new List<IMyThrust>();
             upHydro = new List<IMyThrust>();
             upIon = new List<IMyThrust>();
@@ -1983,27 +1951,11 @@ namespace IngameScript
                     {
                         preferHydroToIon = bool.Parse(splits[1]);
                     }
-                    if (splits.Length > 2)
-                    {
-                        Base6Directions.Direction direction;
-                        try
-                        {
-                            direction = (Base6Directions.Direction)Enum.Parse(typeof(Base6Directions.Direction), splits[2], true);
-                        }
-                        catch (Exception)
-                        {
-                            direction = Base6Directions.Direction.Down;
-                        }
-                        Upright.ReferenceDirection = direction;
-                        this.direction = direction;
-                    }
                 }
                 else
                 {
                     GroupName = "Aligner";
                     preferHydroToIon = true;
-                    Upright.ReferenceDirection = Base6Directions.Direction.Down;
-                    this.direction = Base6Directions.Direction.Down;
                 }
                 status = Status.STARTING_ALIGNER;
                 Runtime.UpdateFrequency = UpdateFrequency.Update1;
