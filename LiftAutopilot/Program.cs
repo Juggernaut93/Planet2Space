@@ -22,6 +22,8 @@ namespace IngameScript
         private string GroupName = "Aligner"; // name of group in terminal containing cockpit, gyros, text panel
         private bool preferHydroToIon = true;
 
+        private bool searchLandingGearsOnlyInGroup = false;
+
         private bool DEBUG = false;
 
         private const double decelerationEpsilon = -0.0001;
@@ -391,7 +393,17 @@ namespace IngameScript
         private void UnlockAllLandingGears()
         {
             List<IMyLandingGear> landingGears = new List<IMyLandingGear>();
-            GridTerminalSystem.GetBlocksOfType<IMyLandingGear>(landingGears);
+
+            IMyBlockGroup group = GridTerminalSystem.GetBlockGroupWithName(GroupName);
+            if (group != null)
+            {
+                group.GetBlocksOfType<IMyLandingGear>(landingGears);
+            }
+            if (landingGears.Count == 0 && !searchLandingGearsOnlyInGroup)
+            {
+                GridTerminalSystem.GetBlocksOfType<IMyLandingGear>(landingGears, block => block.CubeGrid == Me.CubeGrid);
+            }
+            
             foreach (var gear in landingGears)
             {
                 if (gear.IsLocked)
