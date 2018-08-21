@@ -1,4 +1,5 @@
 # Planet2Space
+Space Engineers script: make your ship reach space more efficiently than using autopilot
 
 Planet2Space by Juggernaut93 (with code from Gravity Aligner by p3st|cIdE)
 
