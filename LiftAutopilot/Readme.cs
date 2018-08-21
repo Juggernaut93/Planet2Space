@@ -29,7 +29,7 @@
  *   HOW IT WORKS:
  *      1) All landing gears in GroupName are unlocked:
  *          - if there are no landing gears in GroupName and the script variable "searchLandingGearsOnlyInGroup" is set to false,
- *            the script will then unlock all landing gears on same grid (i.e. not on carried ships, and so on)
+ *            the script will then unlock all landing gears on same grid (i.e. not on docked ships, and so on)
  *      2) Gravity Aligner is started to keep the ship oriented so that the selected cockpit has the "down" direction towards the planet
  *         (i.e. the natural orientation of the ship = NOT upside down :)). You can still manually rotate the ship around the gravity vector.
  *      3) When the ship is aligned (>99% of thrust will be applied downwards) and it has no significant lateral velocity (< 0.1m/s)
