@@ -1,8 +1,9 @@
 # Planet2Space
+Space Engineers script: make your ship reach space more efficiently than using autopilot
 
 Planet2Space by Juggernaut93 (with code from Gravity Aligner by p3st|cIdE)
 
-**SETUP:**
+## Setup
    1) Create a group with a cockpit (or remote control or some other ship controller) to use as orientation reference and gyros.
       These blocks will be used by Gravity Aligner to align the ship in the correct direction
       (more info here: https://steamcommunity.com/sharedfiles/filedetails/?id=567481214).
@@ -23,7 +24,7 @@ IF YOU HAVE A SHIP WITH A COCKPIT/CONTROL STATION/ETC. WITH THE FRONT ORIENTED T
 ADD A SECONDARY SHIP CONTROLLER (E.G. REMOTE CONTROL) ORIENTED IN THE "NORMAL WAY" (THE DOWNSIDE OF THE REMOTE CONTROLLER IS
 ORIENTED TOWARDS THE PLANET = THE DIRECTION TOWARDS WHICH THE THRUSTER THAT SHOULD LIFT YOUR SHIP TO SPACE WILL PUSH).**
 
-**HOW IT WORKS:**
+## How it works
    1) All landing gears (if present) are unlocked and all thrusters not pointing up are shut down
    2) Gravity Aligner is started to keep the ship oriented so that the selected cockpit has the "down" direction towards the planet
       (i.e. the natural orientation of the ship = NOT upside down :)). You can still manually rotate the ship around the gravity vector.
