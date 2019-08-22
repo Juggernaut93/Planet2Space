@@ -418,7 +418,9 @@ namespace IngameScript
 
         private float GetAtmoEffectiveThrust()
         {
-            return upAtmo[0].MaxEffectiveThrust;
+            if (upAtmo.Count > 0)
+                return upAtmo[0].MaxEffectiveThrust;
+            return 0;
         }
 
         private float GetTotalEffectiveThrust(List<IMyThrust> thrusters)
@@ -1659,7 +1661,7 @@ namespace IngameScript
             public void Show(IMyTextPanel display)
             {
                 if (Text == null || Texture)
-                    display.ShowTextureOnScreen();
+                    display.ContentType = VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;
                 if (Text != null)
                     if (Texture)
                     {
@@ -1674,8 +1676,8 @@ namespace IngameScript
                         else if (Screen.IsCorner(display) && (!Compact || display.CubeGrid.GridSize > 1f)) Param *= .5f;
                         if (Param > 0) Screen.SetFontSize(display, Param);
                         display.ClearImagesFromSelection();
-                        display.WritePublicText(Text);
-                        display.ShowPublicTextOnScreen();
+                        display.ContentType = VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;
+                        display.WriteText(Text);
                         display.CustomData = Log.diagnostic.ToString(); // using CustomData as private (diagnostic) output for LCDs
                     }
             }
@@ -1830,12 +1832,12 @@ namespace IngameScript
             {
                 foreach (var s in Screens)
                 { // clear screens on save, so that on Load we know anything written was from the loading script
-                    s.WritePublicText("");
+                    s.WriteText("");
                     s.CustomData = "";
                     if (textBackgroundColor != null)
                         textBackgroundColor.SetValue(s, Color.Black);
                     s.AddImageToSelection("Offline", true);
-                    s.ShowTextureOnScreen();
+                    s.ContentType = VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;
                 }
                 foreach (var l in Lights)
                 {
@@ -1998,8 +2000,8 @@ namespace IngameScript
                 if (DEBUG)
                 {
                     IMyTextPanel lcd = (IMyTextPanel)GridTerminalSystem.GetBlockWithName("LCD");
-                    lcd.WritePublicText(shipvAgainstGravity + "\n" + lateralVelocity.Length());
-                    lcd.ShowPublicTextOnScreen();
+                    lcd.ContentType = VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;
+                    lcd.WriteText(shipvAgainstGravity + "\n" + lateralVelocity.Length());
                 }
 
                 if (GetComponentAgainstGravity() > 0.99 && lateralVelocity.Length() < 0.1) // well-oriented and no significant lateral velocity
@@ -2040,8 +2042,8 @@ namespace IngameScript
                         Vector3D shipVelVectorAgainstGravity = Vector3D.Multiply(Vector3D.Multiply(g, -1 / g.Length()), shipvAgainstGravity);
                         Vector3D lateralVelocity = Vector3D.Subtract(controller.GetShipVelocities().LinearVelocity, shipVelVectorAgainstGravity);
                         IMyTextPanel lcd = (IMyTextPanel)GridTerminalSystem.GetBlockWithName("LCD");
-                        lcd.WritePublicText(shipvAgainstGravity + "\n" + lateralVelocity.Length());
-                        lcd.ShowPublicTextOnScreen();
+                        lcd.ContentType = VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;
+                        lcd.WriteText(shipvAgainstGravity + "\n" + lateralVelocity.Length());
                     }
 
                     if (upStatus == UpStatus.FIRST_MAX)
